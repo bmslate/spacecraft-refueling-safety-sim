@@ -1,0 +1,3 @@
+timestamp,state,alignment,pressure,fuel,dock,gate,fault
+2026-05-18T23:10:00,REFUELING,30,40,0,1,OPEN,NONE
+2026-05-18T23:10:00,ABORT,30,40,0,1,CLOSED,ALIGNMENT_LOST
