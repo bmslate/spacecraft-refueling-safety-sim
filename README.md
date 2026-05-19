@@ -275,6 +275,75 @@ LOG,END
 
 ---
 
+## Hardware-in-the-Loop Extension
+
+In addition to the software-in-the-loop C controller and Python supervisor, this project includes a Teensy 4.1 hardware-in-the-loop test version.
+
+The Teensy version reads real sensor inputs and drives LED indicators while outputting telemetry over USB serial. For this prototype, the foil-based capacitive sensor is used as a simulated docking alignment sensor, and the analog temperature sensor is used as a simulated pressure input.
+
+### Hardware Used
+
+- Teensy 4.1
+- Foil-based capacitive sensor
+- Analog temperature sensor used as simulated pressure input
+- Red LED for ABORT / FAULT
+- Green LED for SAFE / NORMAL
+- Yellow LED for WARNING
+
+### Hardware Pin Mapping
+
+```text
+Foil capacitive sensor:
+SEND_PIN    = 17
+RECEIVE_PIN = 8
+
+Simulated pressure sensor:
+TEMP_PIN = A7
+
+LED indicators:
+RED_LED    = Pin 16
+GREEN_LED  = Pin 15
+YELLOW_LED = Pin 14
+```
+
+### Hardware Test File
+
+```text
+hardware_teensy/TeensyRefuelingHardwareTest.ino
+```
+
+### Hardware Telemetry Example
+
+The Teensy outputs telemetry in a similar format to the software controller:
+
+```text
+TLM,STATE=HARDWARE_TEST,ALIGN=95,PRESSURE=25,FUEL=0,DOCK=0,GATE=CLOSED,FAULT=NONE
+```
+
+If the foil alignment signal drops below the safe threshold, the Teensy reports:
+
+```text
+TLM,STATE=HARDWARE_TEST,ALIGN=30,PRESSURE=25,FUEL=0,DOCK=0,GATE=CLOSED,FAULT=ALIGNMENT_LOST
+```
+
+If the simulated pressure value is outside the safe range, it reports:
+
+```text
+TLM,STATE=HARDWARE_TEST,ALIGN=95,PRESSURE=90,FUEL=0,DOCK=0,GATE=CLOSED,FAULT=PRESSURE_OUT_OF_RANGE
+```
+
+### LED Behavior
+
+```text
+Green LED  = normal / safe condition
+Yellow LED = warning condition
+Red LED    = alignment lost or pressure out of range
+```
+
+This hardware extension demonstrates that the software-in-the-loop design can be connected to real embedded hardware inputs and outputs. The Teensy acts as a hardware subsystem prototype that produces live telemetry from physical sensors and visualizes safety states through LED indicators.
+
+---
+
 ## Engineering Challenge
 
 One engineering challenge was deciding how to separate responsibilities between the controller and the supervisor.
@@ -305,11 +374,11 @@ It is a software-in-the-loop prototype designed to demonstrate embedded control 
 
 ## Future Improvements
 
-- Port the C controller to a Teensy or another microcontroller
+- Integrate the Teensy hardware test directly with the Python safety supervisor over USB serial
+- Port the full C refueling state machine to Teensy firmware
 - Add UART or CAN-style packet framing
 - Add checksum or CRC validation
 - Add watchdog timeout behavior
 - Add unit tests for the command parser
 - Add a graphical ground-station dashboard
-- Add real sensor input and actuator output
 - Add more detailed fault recovery modes
