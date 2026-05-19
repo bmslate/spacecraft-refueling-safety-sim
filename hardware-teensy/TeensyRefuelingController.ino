@@ -26,8 +26,8 @@
 #define MAX_LINE 128
 
 #define ALIGNMENT_MIN_SAFE 80
-#define PRESSURE_MIN_SAFE 20
-#define PRESSURE_MAX_SAFE 80
+#define PRESSURE_MIN_SAFE 25
+#define PRESSURE_MAX_SAFE 32
 
 #define REFUEL_UPDATE_INTERVAL_MS 700
 
@@ -658,6 +658,25 @@ void setup() {
   sendTelemetry(&controller);
 }
 
+//void loop() {
+//  updateSensorInputs(&controller);
+//  updateRefueling(&controller);
+//  updateLEDs(&controller);
+//
+//  processSerialInput();
+//
+//  // Optional periodic telemetry during refueling
+//  static unsigned long lastPeriodicTelemetry = 0;
+//
+//  if (millis() - lastPeriodicTelemetry >= 1000) {
+//    lastPeriodicTelemetry = millis();
+//
+//    if (controller.state == STATE_REFUELING) {
+//      sendTelemetry(&controller);
+//    }
+//  }
+//}
+
 void loop() {
   updateSensorInputs(&controller);
   updateRefueling(&controller);
@@ -665,14 +684,11 @@ void loop() {
 
   processSerialInput();
 
-  // Optional periodic telemetry during refueling
+  // Periodic telemetry every 10 seconds in all states
   static unsigned long lastPeriodicTelemetry = 0;
 
-  if (millis() - lastPeriodicTelemetry >= 1000) {
+  if (millis() - lastPeriodicTelemetry >= 10000) {
     lastPeriodicTelemetry = millis();
-
-    if (controller.state == STATE_REFUELING) {
-      sendTelemetry(&controller);
-    }
+    sendTelemetry(&controller);
   }
 }
